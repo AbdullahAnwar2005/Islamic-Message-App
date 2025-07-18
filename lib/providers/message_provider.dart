@@ -1,25 +1,43 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/message_section.dart';
-import '../services/message_service.dart';
+import '../../../providers/message_repo_provider.dart';
 
-final messageServiceProvider = Provider((ref) => MessageService());
 
-final messageProvider = StateNotifierProvider<MessageNotifier, AsyncValue<List<MessageSection>>>(
-      (ref) => MessageNotifier(ref.watch(messageServiceProvider)),
-);
+import 'package:flutter/foundation.dart';
 
-class MessageNotifier extends StateNotifier<AsyncValue<List<MessageSection>>> {
-  final MessageService service;
+import '../data/local/models/full_message_model.dart';
 
-  MessageNotifier(this.service) : super(const AsyncLoading());
+@immutable
+class MessageParams {
+  final int messageId;
+  final String languageCode;
 
-  Future<void> load(String langCode) async {
-    state = const AsyncLoading();
-    try {
-      final sections = await service.loadSections(langCode);
-      state = AsyncValue.data(sections);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
+  const MessageParams({
+    required this.messageId,
+    required this.languageCode,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is MessageParams &&
+              runtimeType == other.runtimeType &&
+              messageId == other.messageId &&
+              languageCode == other.languageCode;
+
+  @override
+  int get hashCode => messageId.hashCode ^ languageCode.hashCode;
 }
+
+
+/// ✅ مزوّد لجلب جميع الرسائل بلغة معينة
+final messagesProvider = FutureProvider.family<List<FullMessageModel>, String>((ref, languageCode) async {
+  final repo = ref.watch(messageRepositoryProvider);
+  return repo.getAllMessagesByLanguage(languageCode);
+});
+
+
+/// ✅ مزوّد لجلب رسالة واحدة (العنوان + الترجمة) حسب id واللغة
+final messageProvider = FutureProvider.family<FullMessageModel?, MessageParams>((ref, params) async {
+  final repo = ref.watch(messageRepositoryProvider);
+  return repo.getMessageWithTranslation(params.messageId, params.languageCode);
+});
