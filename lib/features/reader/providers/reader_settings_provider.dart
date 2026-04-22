@@ -1,85 +1,78 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/local/app_database.dart';
-
-enum ReaderTheme { system, light, dark, sepia }
-enum ReaderPageStyle { scroll, page }
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReaderSettings {
   final double fontSize;
   final double lineHeight;
-  final ReaderTheme theme;
-  final String fontFamily;
-  final ReaderPageStyle pageStyle;
+  final bool isPageView; // [NEW]
+
   const ReaderSettings({
-    this.fontSize = 18,
-    this.lineHeight = 1.5,
-    this.theme = ReaderTheme.system,
-    this.fontFamily = 'NotoNaskhArabic',
-    this.pageStyle = ReaderPageStyle.scroll,
+    required this.fontSize,
+    required this.lineHeight,
+    required this.isPageView,
   });
 
   ReaderSettings copyWith({
-    double? fontSize, double? lineHeight, ReaderTheme? theme,
-    String? fontFamily, ReaderPageStyle? pageStyle,
+    double? fontSize,
+    double? lineHeight,
+    bool? isPageView,
   }) => ReaderSettings(
     fontSize: fontSize ?? this.fontSize,
     lineHeight: lineHeight ?? this.lineHeight,
-    theme: theme ?? this.theme,
-    fontFamily: fontFamily ?? this.fontFamily,
-    pageStyle: pageStyle ?? this.pageStyle,
+    isPageView: isPageView ?? this.isPageView,
   );
 }
 
 final readerSettingsProvider =
-StateNotifierProvider<ReaderSettingsNotifier, ReaderSettings>((ref) {
-  final db = ref.watch(appDatabaseProvider);
-  return ReaderSettingsNotifier(db)..load();
-});
+    StateNotifierProvider<ReaderSettingsNotifier, ReaderSettings>(
+      (ref) => ReaderSettingsNotifier()..load(),
+    );
 
 class ReaderSettingsNotifier extends StateNotifier<ReaderSettings> {
-  ReaderSettingsNotifier(this._db) : super(const ReaderSettings());
-  final AppDatabase _db;
+  ReaderSettingsNotifier()
+    : super(
+        const ReaderSettings(fontSize: 18, lineHeight: 1.6, isPageView: false),
+      );
+
+  static const _fontKey = 'reader_font_size';
+  static const _lineKey = 'reader_line_height';
+  static const _viewKey = 'reader_is_page_view';
 
   Future<void> load() async {
-    final row = await _db.readingSettingsDao.getSettings();
+    final prefs = await SharedPreferences.getInstance();
+    final size = prefs.getDouble(_fontKey) ?? state.fontSize;
+    final line = prefs.getDouble(_lineKey) ?? state.lineHeight;
+    final isPage = prefs.getBool(_viewKey) ?? state.isPageView;
     state = ReaderSettings(
-      fontSize: row.fontSize,
-      lineHeight: row.lineHeight,
-      theme: _toTheme(row.theme),
-      fontFamily: row.fontFamily,
-      pageStyle: _toPageStyle(row.pageStyle),
+      fontSize: size,
+      lineHeight: line,
+      isPageView: isPage,
     );
   }
 
-  Future<void> setFontSize(double v) async {
-    state = state.copyWith(fontSize: v);
-    await _db.readingSettingsDao.updateSettings(fontSize: v);
-  }
-  Future<void> setLineHeight(double v) async {
-    state = state.copyWith(lineHeight: v);
-    await _db.readingSettingsDao.updateSettings(lineHeight: v);
-  }
-  Future<void> setTheme(ReaderTheme t) async {
-    state = state.copyWith(theme: t);
-    await _db.readingSettingsDao.updateSettings(theme: _fromTheme(t));
-  }
-  Future<void> setPageStyle(ReaderPageStyle s) async {
-    state = state.copyWith(pageStyle: s);
-    await _db.readingSettingsDao.updateSettings(pageStyle: _fromPageStyle(s));
+  Future<void> _save() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_fontKey, state.fontSize);
+    await prefs.setDouble(_lineKey, state.lineHeight);
+    await prefs.setBool(_viewKey, state.isPageView);
   }
 
-  static ReaderTheme _toTheme(String s){
-    switch (s) { case 'light': return ReaderTheme.light;
-      case 'dark': return ReaderTheme.dark;
-      case 'sepia': return ReaderTheme.sepia;
-      default: return ReaderTheme.system; }
+  void setFontSize(double size) {
+    state = state.copyWith(fontSize: size.clamp(12, 36));
+    _save();
   }
-  static String _fromTheme(ReaderTheme t){
-    switch (t) { case ReaderTheme.light: return 'light';
-      case ReaderTheme.dark: return 'dark';
-      case ReaderTheme.sepia: return 'sepia';
-      case ReaderTheme.system: default: return 'system'; }
+
+  void adjustFontSize(double delta) {
+    setFontSize(state.fontSize + delta);
   }
-  static ReaderPageStyle _toPageStyle(String s)=> s=='page'?ReaderPageStyle.page:ReaderPageStyle.scroll;
-  static String _fromPageStyle(ReaderPageStyle s)=> s==ReaderPageStyle.page?'page':'scroll';
+
+  void setLineHeight(double line) {
+    state = state.copyWith(lineHeight: line.clamp(1.0, 2.5));
+    _save();
+  }
+
+  void setPageView(bool isPage) {
+    state = state.copyWith(isPageView: isPage);
+    _save();
+  }
 }

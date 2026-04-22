@@ -158,15 +158,23 @@ class _LanguageSelectionScreenState
               // --- Header ---
               Center(
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
-                    color: scheme.primaryContainer,
                     shape: BoxShape.circle,
+                    color: scheme.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: Icon(
-                    Icons.auto_stories_rounded,
-                    size: 40,
-                    color: scheme.primary,
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'assets/icon/Islamic_message_app_launcher_icon.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -279,6 +287,7 @@ class _LanguageSelectionScreenState
                     _isLoadingContentLangs
                         ? const Center(child: CircularProgressIndicator())
                         : ListView.separated(
+                          physics: const ClampingScrollPhysics(),
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           itemCount: _supportedContentLanguages.length,
                           separatorBuilder:
@@ -368,8 +377,7 @@ class _AppLangSegment extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         margin: const EdgeInsets.all(0),
         decoration: BoxDecoration(
           color: isSelected ? scheme.surface : Colors.transparent,
@@ -420,8 +428,7 @@ class _ContentLangTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color:

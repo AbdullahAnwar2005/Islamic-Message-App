@@ -10,10 +10,19 @@ class SupabaseService {
     return response;
   }
 
+  /// Fetch sections
+  Future<List<Map<String, dynamic>>> fetchSections() async {
+    final response = await supabase
+        .from('sections')
+        .select()
+        .order('sort_order');
+    return response;
+  }
+
   /// Fetch translations for a specific message
   Future<List<Map<String, dynamic>>> fetchTranslations(int messageId) async {
     final response = await supabase
-        .from('message_translations')
+        .from('translations')
         .select()
         .eq('message_id', messageId);
     return response;
@@ -22,11 +31,11 @@ class SupabaseService {
   /// Optionally: Upload audio (in admin/editor use case)
   Future<void> uploadAudioFile(String filePath, String storagePath) async {
     final file = File(filePath);
-    await supabase.storage.from('audios').upload(storagePath, file);
+    await supabase.storage.from('audio').upload(storagePath, file);
   }
 
   /// Download audio URL
   String getPublicAudioUrl(String path) {
-    return supabase.storage.from('audios').getPublicUrl(path);
+    return supabase.storage.from('audio').getPublicUrl(path);
   }
 }

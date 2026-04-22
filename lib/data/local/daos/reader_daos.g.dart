@@ -11,6 +11,10 @@ mixin _$ReadingProgressDaoMixin on DatabaseAccessor<AppDatabase> {
   $ReadingProgressTableTable get readingProgressTable =>
       attachedDatabase.readingProgressTable;
 }
+mixin _$AudioProgressDaoMixin on DatabaseAccessor<AppDatabase> {
+  $AudioProgressTableTable get audioProgressTable =>
+      attachedDatabase.audioProgressTable;
+}
 mixin _$BookmarksDaoMixin on DatabaseAccessor<AppDatabase> {
   $BookmarksTableTable get bookmarksTable => attachedDatabase.bookmarksTable;
 }

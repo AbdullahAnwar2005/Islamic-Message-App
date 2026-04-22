@@ -25,7 +25,7 @@ final lightTheme = ThemeData(
     ),
   ),
   inputDecorationTheme: buildLightTextFieldTheme(lightTextTheme),
-
+  iconTheme: IconThemeData(size: 30),
 );
 
 // dark theme data
@@ -51,4 +51,5 @@ final darkTheme = ThemeData(
     ),
   ),
   inputDecorationTheme: buildDarkTextFieldTheme(darkTextTheme),
+  iconTheme: IconThemeData(size: 30),
 );

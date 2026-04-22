@@ -1,21 +1,23 @@
-import '../data/local/app_database.dart';
-import '../providers/message_language_provider.dart';
+// utils/choose_translation_utility.dart
+import 'package:alghaya_men_alkhalg/data/local/app_database.dart';
+
+String norm(String c) {
+  final x = c.toLowerCase();
+  if (x.startsWith('ar')) return 'ar';
+  if (x.startsWith('en')) return 'en';
+  return x;
+}
 
 Translation? pickTranslation(
     List<Translation> list,
     String desired, {
       String fallback = 'ar',
     }) {
-  String n(String c) => normalizeLang(c);
-  final want = list.firstWhere(
-        (t) => n(t.languageCode) == n(desired),
-    orElse: () => null as Translation, // will be caught below
-  );
-  if (want != null) return want;
+  final want = list.where((t) => norm(t.languageCode) == norm(desired));
+  if (want.isNotEmpty) return want.first;
 
-  final fb = list.firstWhere(
-        (t) => n(t.languageCode) == n(fallback),
-    orElse: () => null as Translation,
-  );
-  return fb ?? (list.isNotEmpty ? list.first : null);
+  final fb = list.where((t) => norm(t.languageCode) == norm(fallback));
+  if (fb.isNotEmpty) return fb.first;
+
+  return list.isNotEmpty ? list.first : null;
 }
