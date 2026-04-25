@@ -229,9 +229,6 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                               displayLang,
                               scheme,
                             ),
-
-                            // REMOVED: ActionChip buttons (العربية and 1.0x)
-                            // Settings are accessed via AppBar settings icon
                           ],
                         ),
                       ),
