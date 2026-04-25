@@ -4,7 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   gtk
+<<<<<<< HEAD
   sentry_flutter
+=======
+>>>>>>> origin/master
   sqlite3_flutter_libs
   url_launcher_linux
 )

@@ -12,7 +12,11 @@
 
     <application
         android:name="${applicationName}"
+<<<<<<< HEAD
         android:label="Islamic Message"
+=======
+        android:label="رسالة الإسلام"
+>>>>>>> origin/master
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="tiramisu">
