@@ -18,7 +18,6 @@ An elegant, performant Flutter application designed to provide daily Islamic mes
 - **Feature-Rich Audio**: Background playback support, speed control, and session management (interruption handling for calls/notifications).
 - **Smart Synchronization**: Throttled background sync (15-min intervals) with Supabase to keep content updated without draining battery or data.
 - **Offline-First**: Fully functional without internet. All content, bookmarks, and even analytics interactions are cached locally using Drift (SQLite).
-- **Guided Flow**: A dedicated "Declare Islam" multi-step module for those interested in learning or taking their Shahada.
 - **Premium UI/UX**: Supports Light/Dark modes, smooth transitions, and RTL/LTR switching.
 - **Accessibility**: Clamped text scaling (max 1.4x) to ensure UI integrity while supporting large text preferences.
 
